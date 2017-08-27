@@ -5,6 +5,7 @@
 #include "cinder/gl/gl.h"
 #include "cinder/Text.h"
 
+#include <array>
 #include <string>
 #include <sstream>
 #include <memory>
@@ -24,6 +25,7 @@ struct Action
         none,
         move,
         shoot,
+        draw,
         quit,
         help
     } type{Action_type::none};
@@ -54,6 +56,7 @@ private:
     std::atomic<bool> isTitleScreen{true};
     std::atomic<bool> isGameOver{false};
     std::atomic<bool> isShootEnabled{false};
+    std::atomic<bool> isDrawEnabled{false};
     std::atomic<Action> nextAction;
     std::atomic<int> arrows;
 
@@ -63,6 +66,8 @@ private:
     std::stringstream buffer;
     std::string outputText;
 
+    std::array<bool, num_rooms> markedRooms{false};
+
     void initialize();
 
     void updateAction();
@@ -70,6 +75,7 @@ private:
     void updateOutputText();
 
     void drawTitleScreen();
+    void drawBackground();
     void drawHUD();
     void drawCave();
     void drawCaveRooms();
@@ -95,6 +101,8 @@ void HuntTheWumpusApp::initialize()
     arrows = game->get_arrows();
     updateOutputText();
     isShootEnabled = false;
+    isDrawEnabled = false;
+    markedRooms = {false};
 }
 
 void HuntTheWumpusApp::keyUp(KeyEvent event)
@@ -106,9 +114,14 @@ void HuntTheWumpusApp::keyUp(KeyEvent event)
     {
     case 'm':
         isShootEnabled = false;
+        isDrawEnabled = false;
         break;
     case 's':
         isShootEnabled = true;
+        isDrawEnabled = false;
+        break;
+    case 'd':
+        isDrawEnabled = !isDrawEnabled;
         break;
     case 'q':
         nextAction = Action(Action::Action_type::quit);
@@ -137,7 +150,9 @@ void HuntTheWumpusApp::mouseUp(MouseEvent event)
 
         if (isOnCircle(event.getPos(), center, radius))
         {
-            if (isShootEnabled)
+            if (isDrawEnabled)
+                nextAction = Action(Action::Action_type::draw, i);
+            else if (isShootEnabled)
                 nextAction = Action(Action::Action_type::shoot, i);
             else
                 nextAction = Action(Action::Action_type::move, i);
@@ -200,6 +215,11 @@ void HuntTheWumpusApp::updateAction()
         updateRoomChange();
         break;
     }
+    case Action::Action_type::draw:
+    {
+        markedRooms[action.target] = !markedRooms[action.target];
+        break;
+    }
     case Action::Action_type::quit:
     {
         game->quit();
@@ -248,6 +268,7 @@ void HuntTheWumpusApp::draw()
     }
     else
     {
+        drawBackground();
         drawHUD();
         drawCave();
         drawConsole();
@@ -263,9 +284,34 @@ void HuntTheWumpusApp::drawTitleScreen()
         Font("Consolas", 20));
 }
 
+void HuntTheWumpusApp::drawBackground()
+{
+    if (isGameOver)
+    {
+        if (game->get_game_state() == Game_state::wumpus_dead)
+        {
+            gl::clear(Color(0.0f, 0.25f, 0.0f));
+        }
+        else
+        {
+            gl::clear(Color(0.25f, 0.0f, 0.0f));
+        }
+    }
+    else if (isDrawEnabled)
+    {
+        gl::clear(Color(0.2f, 0.2f, 0.2f));
+    }
+    else if (isShootEnabled)
+    {
+        gl::clear(Color(0.0f, 0.0f, 0.25f));
+    }
+}
+
 void HuntTheWumpusApp::drawHUD()
 {
     std::string value = isShootEnabled ? "SHOOT" : "MOVE";
+    value = isDrawEnabled ? "DRAW" : value;
+
     value += "\n";
     value += "ARROWS: " + std::to_string(arrows);
     gl::drawString(
@@ -302,6 +348,20 @@ void HuntTheWumpusApp::drawCaveRooms()
             center,
             Color(0.0f, 0.0f, 0.0f),
             Font("Consolas", radius));
+
+        if (markedRooms[i])
+        {
+            // Draw an X over the room.
+            gl::color(Color(0.0f, 0.0f, 0.0f));
+            gl::lineWidth(std::max(radius / 10.0f, 1.0f));
+
+            vec2 v1(radius * 0.707f, radius * 0.707f);
+            gl::drawLine(center - v1, center + v1);
+            vec2 v2(radius * 0.707f, -radius * 0.707f);
+            gl::drawLine(center - v2, center + v2);
+
+            gl::lineWidth(1.0f);
+        }
     }
 }
 
