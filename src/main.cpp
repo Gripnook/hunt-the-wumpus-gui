@@ -193,7 +193,10 @@ void HuntTheWumpusApp::updateAction()
         auto target = std::array<int, connections_per_room>{
             game->get_rooms()[action.target].number, -1, -1};
         if (game->can_shoot(target))
+        {
             game->shoot(target);
+            isShootEnabled = false; // Allow one shot before switching back.
+        }
         updateRoomChange();
         break;
     }
