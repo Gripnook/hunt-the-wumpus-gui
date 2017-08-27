@@ -1,2 +1,2 @@
 # Hunt the Wumpus
-A wumpus hunting game.
+A wumpus hunting game with a GUI.
