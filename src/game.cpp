@@ -57,21 +57,7 @@ std::string Game::game_info()
        << "    \"" << pit_adjacent_message
        << "\": One of the adjacent rooms is a bottomless pit." << std::endl
        << "    \"" << bat_adjacent_message
-       << "\": A giant bat is in an adjacent room." << std::endl
-       << "During each turn you must make a move. The possible moves are:"
-       << std::endl
-       << "    \"m #\": Move to an adjacent room." << std::endl
-       << "    \"s #[-#...]\": Shoot an arrow through the rooms specified. The"
-       << std::endl
-       << "        first room number specified must be an adjacent room. The"
-       << std::endl
-       << "        range of an arrow is " << arrow_range
-       << " rooms, and a path will be chosen at" << std::endl
-       << "        random if not specified. You have " << num_arrows
-       << " arrows at the start of" << std::endl
-       << "        the game." << std::endl
-       << "    \"q\": Quit the game and flee the cave." << std::endl
-       << "Good luck!" << std::endl;
+       << "\": A giant bat is in an adjacent room." << std::endl;
     return ss.str();
 }
 

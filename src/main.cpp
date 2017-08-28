@@ -45,6 +45,8 @@ struct Action
 class HuntTheWumpusApp : public App
 {
 public:
+    static std::string titleScreenText();
+
     void setup() override;
     void keyUp(KeyEvent event) override;
     void mouseUp(MouseEvent event) override;
@@ -86,6 +88,27 @@ private:
     float getRadius(vec2 caveSize) const;
     bool isOnCircle(vec2 position, vec2 center, float radius) const;
 };
+
+std::string HuntTheWumpusApp::titleScreenText()
+{
+    std::stringstream ss;
+    ss << Game::game_info();
+    ss << "During each turn you must make a move. The possible moves are:"
+       << std::endl
+       << "    \"m #\": Move to an adjacent room." << std::endl
+       << "    \"s #\": Shoot an arrow through the room specified. The range"
+       << std::endl
+       << "        of an arrow is " << arrow_range
+       << " rooms, and a path will be chosen at random." << std::endl
+       << "        You have " << num_arrows
+       << " arrows at the start of the game." << std::endl
+       << "    \"d\": Enter draw mode to mark rooms as dangerous." << std::endl
+       << "    \"q\": Quit the game and flee the cave." << std::endl
+       << "    \"h\": Pause the game and return to the title screen."
+       << std::endl
+       << "Good luck!" << std::endl;
+    return ss.str();
+}
 
 void HuntTheWumpusApp::setup()
 {
@@ -278,7 +301,7 @@ void HuntTheWumpusApp::draw()
 void HuntTheWumpusApp::drawTitleScreen()
 {
     gl::drawString(
-        Game::game_info(),
+        titleScreenText(),
         vec2(0.0f, 0.0f),
         Color(0.0f, 1.0f, 0.0f),
         Font("Consolas", 20));
