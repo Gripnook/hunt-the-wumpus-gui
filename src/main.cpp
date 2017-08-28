@@ -71,7 +71,7 @@ private:
     void initialize();
 
     void updateAction();
-    void updateRoomChange();
+    void updateActionTaken();
     void updateOutputText();
 
     void drawTitleScreen();
@@ -200,7 +200,7 @@ void HuntTheWumpusApp::updateAction()
         auto target = game->get_rooms()[action.target].number;
         if (game->can_move(target))
             game->move(target);
-        updateRoomChange();
+        updateActionTaken();
         break;
     }
     case Action::Action_type::shoot:
@@ -212,7 +212,7 @@ void HuntTheWumpusApp::updateAction()
             game->shoot(target);
             isShootEnabled = false; // Allow one shot before switching back.
         }
-        updateRoomChange();
+        updateActionTaken();
         break;
     }
     case Action::Action_type::draw:
@@ -223,7 +223,7 @@ void HuntTheWumpusApp::updateAction()
     case Action::Action_type::quit:
     {
         game->quit();
-        updateRoomChange();
+        updateActionTaken();
         break;
     }
     case Action::Action_type::help:
@@ -238,7 +238,7 @@ void HuntTheWumpusApp::updateAction()
     }
 }
 
-void HuntTheWumpusApp::updateRoomChange()
+void HuntTheWumpusApp::updateActionTaken()
 {
     if (game->is_hunt_over())
     {
@@ -248,8 +248,8 @@ void HuntTheWumpusApp::updateRoomChange()
     else
     {
         game->inform_player_of_hazards();
-        arrows = game->get_arrows();
     }
+    arrows = game->get_arrows();
     updateOutputText();
 }
 
