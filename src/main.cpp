@@ -126,6 +126,7 @@ void HuntTheWumpusApp::initialize()
     isShootEnabled = false;
     isDrawEnabled = false;
     markedRooms = {false};
+    nextAction = Action(Action::Action_type::none);
 }
 
 void HuntTheWumpusApp::keyUp(KeyEvent event)
@@ -194,6 +195,7 @@ void HuntTheWumpusApp::update()
         if (isTitleScreen)
         {
             isTitleScreen = false;
+            nextAction = Action(Action::Action_type::none);
         }
         else if (isGameOver)
         {
