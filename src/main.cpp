@@ -279,7 +279,7 @@ void HuntTheWumpusApp::updateActionTaken()
 void HuntTheWumpusApp::updateOutputText()
 {
     outputText = buffer.str();
-    buffer.swap(std::stringstream());
+    buffer = std::stringstream{};
 }
 
 void HuntTheWumpusApp::draw()
